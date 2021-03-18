@@ -36,7 +36,7 @@ You should implement the transformation matrices inside `updateViewMatrix`, `upd
 ![Assignment 2 example](manhattan.png)
 
 #### Task 4
-You should implement the light transformation matrices inside `updateLightViewMatrix` and `updateLightProjectionMatrix`, in such a way that when the user changes the value of slider (3), the light direction rotates around the centerpoint of the layers. As seein in class, these matrices should be used in the *first* pass of the shadow map technique.
+You should implement the light transformation matrices inside `updateLightViewMatrix` and `updateLightProjectionMatrix`, in such a way that when the user changes the value of slider (3), the light direction rotates around the centerpoint of the layers. Make sure that you use the *same light direction for both shadow map and surface shading* (for layers that have normals). As seein in class, these matrices should be used in the *first* pass of the shadow map technique.
 
 #### Task 5
 In order to ensure that you have successfully implemented tasks 3 and 4, make sure that you can seperately render the city model from the perspective of the camera and the light. After that, you will need to store the result of task 4 in a texture (make use of a framebuffer object to do that). Modify your implementation of task 3 so that it uses this depth texture to compute the shadow information in the fragment shader. Here is an example of the result:
