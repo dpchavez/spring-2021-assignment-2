@@ -1,7 +1,7 @@
 # CS425 - Computer Graphics I (Spring 2021)
 
 ## Assignment 2: Shadow maps
-The goal of this assignment is to implement the shadow mapping technique using WebGL. Also considering what we have learned in assignment 1, you will develop an application to render shadows on an urban setting described in an external JSON file that must be uploaded by the user through a configuration panel. The JSON file has four layers describing the elements and color of buildings, parks, water and surface of a particular region (see below for a complete description of the file). Just like assignment 1, you should use a unique buffer and VAO for *each* layer.
+The goal of this assignment is to implement the shadow mapping technique using WebGL. Also considering what we have learned in assignment 1, you will develop an application to render shadows (directional light) on an urban setting described in an external JSON file that must be uploaded by the user through a configuration panel. The JSON file has four layers describing the elements and color of buildings, parks, water and surface of a particular region (see below for a complete description of the file). Just like assignment 1, you should use a unique buffer and VAO for *each* layer.
 
 There are five tasks, and you are free to use the skeleton code provided. The code has some comments detailing what needs to be implemented in each function; it contains functions to handle file upload, and user interactions through the control panel, as well as four main classes:
 - `FBO`: handles the creation and binding of [framebuffer objects](https://developer.mozilla.org/en-US/docs/Web/API/WebGLFramebuffer).
@@ -46,7 +46,7 @@ In order to ensure that you have successfully implemented tasks 3 and 4, make su
 #### Task 6
 You should implement the RenderToScreen class, so that it renders a texture to screen. If the input (5) is checked, you should display the result of the first pass of the shadow map computation (Task 4). 
 
-![Manhattan shadow](shadowmap.gif)
+![Shadow map](shadowmap.gif)
 
 #### Task 7
 Instead of considering a single shadow map sample, consider multiple shadow map values in a small radius around the sample position (*percentage closer filtering*). The result of these shadow tests should be averaged, getting a smoother line between light and shadow.

@@ -263,13 +263,14 @@ function draw() {
 
     // TODO: First rendering pass, rendering using FBO
 
-    if(displayShadowmap) {
+
+    if(!displayShadowmap) {
         gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
-        // TODO: Render shadowmap texture computed in first pass
+        // TODO: Second rendering pass, render to screen
     }
     else {
         gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
-        // TODO: Second rendering pass, render to screen
+        // TODO: Render shadowmap texture computed in first pass
     }
 
     requestAnimationFrame(draw);
