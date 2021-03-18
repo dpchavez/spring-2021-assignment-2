@@ -49,7 +49,11 @@ You should implement the RenderToScreen class, so that it renders a texture to s
 ![Manhattan shadow](shadowmap.gif)
 
 #### Task 7
+Instead of considering a single shadow map sample, consider multiple shadow map values in a small radius around the sample position (*percentage closer filtering*). The result of these shadow tests should be averaged, getting a smoother line between light and shadow.
+
+#### Task 8
 Write a README.md file with a description of the program. The goal of this file is to 1) explain how to run the program, and 2) detail the main methods and functionalities that were implemented. You are encouraged to use images and diagrams (add them to the repository), make sure to reference them in the text itself.
+
 
 #### JSON format
 
@@ -98,4 +102,4 @@ The delivery of the assignments will be done using GitHub Classes. It will not b
 ### Grading
 The code will be evaluated on Firefox. Your submission will be graded according to the quality of the image results, interactions, and correctness of the implemented algorithms. Your README.me file will also be graded. 
 
-To get a D on the assignment, your application should be able to load a JSON file in the format specified above, and visualize all layers using a perspective projection. To get a C on the assignment, you should implement the shadow map technique for a given light direction. To get a B, you must implement all interactions specified in the configuration panel (camera rotation, light rotation, perspective and orthographic projections). To get an A on the assignment, the application must be able to render the shadow map depth, and have a detailed readme file.
+To get a D on the assignment, your application should be able to load a JSON file in the format specified above, and visualize all layers using a perspective projection. To get a C on the assignment, you should implement the shadow map technique for a given light direction. To get a B, you must implement all interactions specified in the configuration panel (camera rotation, light rotation, perspective and orthographic projections). To get an A on the assignment, the application must be able to render the shadow map depth, implement percentage closer filtering to reduce aliasing, and have a detailed readme file.
