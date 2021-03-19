@@ -175,7 +175,19 @@ class Layer {
     }
 
     init() {
-        // TODO: Create LayerProgram and ShadowProgram, vertex, index and normal buffers (if there are normals), and create VAO
+        this.layerProgram = new LayerProgram();
+        this.shadowProgram = new ShadowMapProgram();
+
+        this.vertexBuffer = createBuffer(gl, gl.ARRAY_BUFFER, new Float32Array(this.vertices));
+        this.indexBuffer = createBuffer(gl, gl.ELEMENT_ARRAY_BUFFER, new Uint32Array(this.indices));
+
+        if(this.normals) {
+            this.normalBuffer = createBuffer(gl, gl.ARRAY_BUFFER, new Float32Array(this.normals));
+            this.vao = createVAO(gl, 0, this.vertexBuffer, 1, this.normalBuffer);
+        }
+        else {
+            this.vao = createVAO(gl, 0, this.vertexBuffer);
+        }
     }
 
     draw(modelMatrix, viewMatrix, projectionMatrix, lightViewMatrix, lightProjectionMatrix, shadowPass = false, texture = null) {
