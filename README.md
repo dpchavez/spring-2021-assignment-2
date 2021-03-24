@@ -43,7 +43,7 @@ In order to ensure that you have successfully implemented tasks 3 and 4, make su
 
 ![Manhattan shadow](manhattan.gif)
 
-#### Task 6 (Optional)
+#### Task 6
 You should implement the RenderToScreen class, so that it renders a texture to screen. If the input (5) is checked, you should display the result of the first pass of the shadow map computation (Task 4). 
 
 ![Shadow map](shadowmap.gif)
@@ -102,4 +102,4 @@ The delivery of the assignments will be done using GitHub Classes. It will not b
 ### Grading
 The code will be evaluated on Firefox. Your submission will be graded according to the quality of the image results, interactions, and correctness of the implemented algorithms. Your README.me file will also be graded. 
 
-To get a C on the assignment, your application should be able to load a JSON file in the format specified above, and visualize all layers using a perspective projection. To get a B on the assignment, you should implement the shadow map technique for a given light direction. To get a A, you must implement all interactions specified in the configuration panel (camera rotation, light rotation, perspective and orthographic projections), and have a detailed readme file.
+To get a D on the assignment, your application should be able to load a JSON file in the format specified above, and visualize all layers using a perspective projection. To get a C on the assignment, you should implement the shadow map technique for a given light direction. To get a B, you must implement all interactions specified in the configuration panel (camera rotation, light rotation, perspective and orthographic projections). To get an A on the assignment, the application must be able to render the shadow map depth, and have a detailed readme file.
