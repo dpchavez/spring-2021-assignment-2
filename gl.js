@@ -17,6 +17,8 @@ var currZoom = 0;
 var currProj = 'perspective';
 var currResolution = 2048;
 var displayShadowmap = false;
+var texture;
+
 
 /*
     FBO
@@ -24,14 +26,22 @@ var displayShadowmap = false;
 class FBO {
     constructor(size) {
         // TODO: Create FBO and texture with size
+        this.texture = createTexture2D(gl, size, size, gl.DEPTH_COMPONENT32F, 0, gl.DEPTH_COMPONENT, gl.FLOAT, null, gl.NEAREST, gl.NEAREST,gl.CLAMP_TO_EDGE, gl.CLAMP_TO_EDGE);
+        this.fbo = createFBO(gl, gl.DEPTH_ATTACHMENT , this.texture);
     }
 
     start() {
         // TODO: Bind FBO, set viewport to size, clear depth buffer
+        gl.bindFramebuffer(gl.FRAMEBUFFER, this.fbo);
+        gl.viewport(0, 0, this.size, this.size);
+         //CLEAR DEPTH BUFFER????
+        gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+
     }
 
     stop() {
         // TODO: unbind FBO
+        gl.bindFramebuffer(gl.FRAMEBUFFER, null);
     }
 }
 
@@ -43,7 +53,6 @@ class ShadowMapProgram {
         this.vertexShader = createShader(gl, gl.VERTEX_SHADER, shadowVertShaderSrc);
         this.fragmentShader = createShader(gl, gl.FRAGMENT_SHADER, shadowFragShaderSrc);
         this.program = createProgram(gl, this.vertexShader, this.fragmentShader);
-
         this.posAttribLoc = gl.getAttribLocation(this.program, "position");
         this.colorAttribLoc = gl.getUniformLocation(this.program, "uColor");
         this.modelLoc = gl.getUniformLocation(this.program, "uModel");
@@ -57,7 +66,7 @@ class ShadowMapProgram {
     }
 
     use() {
-        // TODO: use program
+        gl.useProgram(this.program);
     }
 }
 
@@ -68,12 +77,13 @@ class RenderToScreenProgram {
     constructor() {
         this.vertexShader = createShader(gl, gl.VERTEX_SHADER, depthVertShaderSrc);
         this.fragmentShader = createShader(gl, gl.FRAGMENT_SHADER, depthFragShaderSrc);
-        
         this.program = createProgram(gl, this.vertexShader, this.fragmentShader);
         this.posAttribLoc = gl.getAttribLocation(this.program, "position");
         this.samplerLoc = gl.getUniformLocation(this.program, "uSampler");
 
         // TODO: Create quad VBO and VAO
+        //this.vao = createVAO(gl, posAttribLoc, posBuffer, normAttribLoc = null, normBuffer = null, colorAttribLoc = null, colorBuffer = null);
+        //this.VBO = cr
     }
 
     draw(texture) {
@@ -90,7 +100,6 @@ class LayerProgram {
         this.vertexShader = createShader(gl, gl.VERTEX_SHADER, layerVertShaderSrc);
         this.fragmentShader = createShader(gl, gl.FRAGMENT_SHADER, layerFragShaderSrc);
         this.program = createProgram(gl, this.vertexShader, this.fragmentShader);
-
         this.posAttribLoc = gl.getAttribLocation(this.program, "position");
         this.colorAttribLoc = gl.getUniformLocation(this.program, "uColor");
         this.modelLoc = gl.getUniformLocation(this.program, "uModel");
@@ -177,7 +186,6 @@ class Layer {
     init() {
         this.layerProgram = new LayerProgram();
         this.shadowProgram = new ShadowMapProgram();
-
         this.vertexBuffer = createBuffer(gl, gl.ARRAY_BUFFER, new Float32Array(this.vertices));
         this.indexBuffer = createBuffer(gl, gl.ELEMENT_ARRAY_BUFFER, new Uint32Array(this.indices));
 
@@ -192,6 +200,15 @@ class Layer {
 
     draw(modelMatrix, viewMatrix, projectionMatrix, lightViewMatrix, lightProjectionMatrix, shadowPass = false, texture = null) {
         // TODO: Handle shadow pass (using ShadowMapProgram) and regular pass (using LayerProgram)
+
+        this.layerProgram.use();
+        gl.uniformMatrix4fv(this.layerProgram.projectionLoc, false, new Float32Array(projectionMatrix));
+        gl.uniformMatrix4fv(this.layerProgram.modelLoc, false, new Float32Array(modelMatrix));
+        gl.uniformMatrix4fv(this.layerProgram.viewLoc, false, new Float32Array(viewMatrix));
+        gl.uniform4fv(this.layerProgram.colorAttribLoc, this.color);
+        gl.bindVertexArray(this.vao);
+        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.indexBuffer);
+        gl.drawElements(gl.TRIANGLES, this.indices.length, gl.UNSIGNED_INT, 0);
     }
 }
 
@@ -237,19 +254,42 @@ window.handleFile = function(e) {
     Update transformation matrices
 */
 function updateModelMatrix(centroid) {
-    return identityMatrix();
+    var translation1 = translateMatrix(-centroid[0], -centroid[1], -centroid[2]);
+    var translation2 = translateMatrix(centroid[0], centroid[1], centroid[2]);
+
+    var rotate = rotateZMatrix(currRotate * Math.PI / 180.0);
+    return multiplyArrayOfMatrices([
+        translation2,
+        rotate,
+        translation1
+    ]);
+
 }
 
 function updateProjectionMatrix() {
     // TODO: Projection matrix
-    var projectionMatrix = identityMatrix();
-    return projectionMatrix;
+
+    var aspect = window.innerWidth /  window.innerHeight;
+    if(currProj == 'perspective') {
+        return perspectiveMatrix(45 * Math.PI / 180.0, aspect, 1, 50000);
+    }
+    else {
+        var maxzoom = 5000;
+        var size = maxzoom-(currZoom/100.0)*maxzoom*0.99;
+        return orthographicMatrix(-aspect*size, aspect*size, -1*size, 1*size, -1, 50000);
+    }
+
+
 }
 
 function updateViewMatrix(centroid){
     // TODO: View matrix
-    var viewMatrix = identityMatrix();
-    return viewMatrix;
+    var radRotate = currRotate * Math.PI / 180.0;
+    var maxzoom = 5000;
+    var radius = maxzoom - (currZoom/100.0)*maxzoom*0.99;
+    var x = radius * Math.cos(radRotate);
+    var y = radius * Math.sin(radRotate);
+    return lookAt(add(centroid,[x,y,radius]), centroid, [0,0,1]);
 }
 
 function updateLightViewMatrix(centroid) {
@@ -274,6 +314,10 @@ function draw() {
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
     // TODO: First rendering pass, rendering using FBO
+    //fbo.start()
+    layers.draw(updateModelMatrix(layers.centroid), updateViewMatrix(layers.centroid), updateProjectionMatrix());
+    //fbo.stop()
+    //layers.draw  // second pas
 
 
     if(!displayShadowmap) {
@@ -312,8 +356,8 @@ function initialize() {
     gl.enable(gl.POLYGON_OFFSET_FILL);
 
     layers = new Layers();
-    fbo = new FBO(currResolution);
-    renderToScreen = new RenderToScreenProgram();
+    //fbo = new FBO(currResolution);
+    //renderToScreen = new RenderToScreenProgram();
 
     window.requestAnimationFrame(draw);
 
